@@ -1,0 +1,73 @@
+# Import required functions and dataset. We have done the dataset for you.
+# You will need to import more than 1 function
+# You need to import GridSearchCV, KNeighborsClassifier, DecisionTreeClassifier
+# accuracy_score, confusion_matrix, classification_report
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+from sklearn.datasets import load_breast_cancer
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split 
+
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics import classification_report
+
+#accuracy
+
+df = load_breast_cancer()
+
+df
+# Load the dataset and assign the X data and Y labels
+df = load_breast_cancer()
+X = pd.DataFrame(df['data'], columns=df['feature_names'])   # using data from data
+y = pd.Series(df['target'])   # using target from data
+# Perform the Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+# Decision tree
+dt = DecisionTreeClassifier() # creating decision tree model object
+params = {'criterion': ['gini', 'entropy'],
+          'max_depth': range(1, 11)}
+grid_search = GridSearchCV(estimator = dt, param_grid = params, cv = 5)
+
+# hyperparameter turning and train the model 
+grid_search.fit(X_train, y_train)  
+
+#  make predictions using the X_test
+dt_pred = grid_search.predict(X_test)
+
+#  calculate the evaluation metrics
+dt_acc = accuracy_score(y_test, dt_pred)
+dt_cm = confusion_matrix(y_test, dt_pred)
+dt_cr = classification_report(y_test, dt_pred)
+# Perform Model evaluation
+print('Decision Tree:\n')
+print(f'Accuracy:', dt_acc)  # print accuracy
+print('Confusion matrix:\n', dt_cm) # print confusion matrix
+print('\nClassification report:\n', dt_cr) # print classification report
+# KNN
+knn = KNeighborsClassifier() # creating knn model object
+params = {'n_neighbors': range(1, 11)}
+grid_search = GridSearchCV(estimator = knn, param_grid = params, cv = 5)
+
+# hyperparameter turning and train the model 
+grid_search.fit(X_train, y_train)   
+
+#  make predictions using the X_test
+knn_pred = grid_search.predict(X_test.values)
+
+#  calculate the evaluation metrics
+knn_acc = accuracy_score(y_test, knn_pred)
+knn_cm = confusion_matrix(y_test, knn_pred)
+knn_cr = classification_report(y_test, knn_pred)
+# Perform Model evaluation
+print('\nKNN:\n')
+print('Accuracy:', knn_acc) # print accuracy
+print('Confusion matrix:\n', knn_cm) # print confusion matrix
+print('\nClassification report:\n', knn_cr) # print classification report
